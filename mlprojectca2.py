@@ -28,10 +28,13 @@ import tensorflow as tf
 seed = 232
 np.random.seed(seed)
 tf.set_random_seed(seed)
+from google.colab import drive
+drive.mount('/content/drive/')
 
-train = pd.read_csv('train.csv')  
-test = pd.read_csv('test.csv') 
-val = pd.read_csv('val.csv') 
+import zipfile
+with zipfile.ZipFile("archive.zip","r") as zip_ref:
+    zip_ref.extractall("content/drive/")
+input_path = '../input/chest-xray-pneumonia//chest_xray/chest_xray/'  
 
 fig, ax = plt.subplots(2, 3, figsize=(15, 7))
 ax = ax.ravel()
@@ -39,9 +42,9 @@ plt.tight_layout()
 
 for i, _set in enumerate(['train', 'val', 'test']):
     set_path = input_path+_set
-    ax[i].imshow(plt.imread(set_path+'/NORMAL/'+os.listdir(set_path+'/NORMAL')[0]), cmap='gray')
+    ax[i].imshow(plt.imread(set_path+'/NORMAL/'+(set_path+'/NORMAL')[0]), cmap='gray')
     ax[i].set_title('Set: {}, Condition: Normal'.format(_set))
-    ax[i+3].imshow(plt.imread(set_path+'/PNEUMONIA/'+os.listdir(set_path+'/PNEUMONIA')[0]), cmap='gray')
+    ax[i+3].imshow(plt.imread(set_path+'/PNEUMONIA/'+(set_path+'/PNEUMONIA')[0]), cmap='gray')
     ax[i+3].set_title('Set: {}, Condition: Pneumonia'.format(_set))
 
 for _set in ['train', 'val', 'test']:
@@ -75,7 +78,7 @@ def process_data(img_dims, batch_size):
     test_labels = []
 
     for cond in ['/NORMAL/', '/PNEUMONIA/']:
-        for img in (os.listdir(input_path + 'test' + cond)):
+        for img in ((input_path + 'test' + cond)):
             img = plt.imread(input_path+'test'+cond+img)
             img = cv2.resize(img, (img_dims, img_dims))
             img = np.dstack([img, img, img])
